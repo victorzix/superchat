@@ -1,0 +1,50 @@
+services:
+  database:
+    env_file:
+      - path: './.env'
+        required: true
+    image: postgres:latest
+    container_name: superchat-postgres
+    restart: always
+    shm_size: 128mb
+    environment:
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_DB=${DATABASE_NAME}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./superchat-api
+    container_name: superchat-app
+    restart: always
+    env_file:
+      - path: './superchat-api/.env.production'
+        required: true
+    depends_on:
+      - database
+    expose:
+      - "3001"
+
+  frontend:
+    build: ./superchat-front
+    container_name: superchat-front
+    restart: always
+    expose:
+      - "3000"
+
+  nginx:
+    image: nginx:latest
+    container_name: superchat-nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
+      - frontend
+volumes:
+  postgres_data:

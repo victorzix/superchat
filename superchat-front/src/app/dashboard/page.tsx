@@ -1,0 +1,21 @@
+'use client'
+import {useUser} from "@/features/auth/hooks/useUser";
+import {useEffect} from "react";
+
+export default function Dashboard() {
+  const {user, getUser, logoutUser} = useUser();
+
+  useEffect(() => {
+    if (!user) {
+      getUser().catch(async () => {
+        await logoutUser();
+      });
+    }
+
+  }, [user, getUser, logoutUser]);
+  return (
+    <>
+      {user?.phone}
+    </>
+  )
+}
