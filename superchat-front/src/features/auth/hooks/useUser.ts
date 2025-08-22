@@ -24,8 +24,11 @@ export function useUser() {
   }
 
   async function logoutUser() {
-    await logout();
-    router.push('/login')
+    try {
+      await logout();
+    } finally {
+      router.push('/login')
+    }
   }
 
   async function getUser() {
