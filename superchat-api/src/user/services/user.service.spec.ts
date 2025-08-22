@@ -5,6 +5,7 @@ import { RegisterUserDto } from '@/user/dto/request/register-user.dto';
 import { hash } from 'bcrypt';
 import { IUserService } from '@/user/interfaces/user.service.interface';
 import { UserService } from '@/user/services/user.service';
+import { JwtModule } from '@nestjs/jwt';
 
 describe('UserService', () => {
   let userService: IUserService;
@@ -19,6 +20,12 @@ describe('UserService', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
+      imports: [
+        JwtModule.register({
+          secret: 'test-secret',
+          signOptions: { expiresIn: '1' },
+        }),
+      ],
       providers: [
         {
           useValue: mockRepository,
@@ -42,6 +49,8 @@ describe('UserService', () => {
     it('should create and return a new user', async () => {
       const password = await hash('a123sa', 12);
       const registerDto: RegisterUserDto = {
+        name: 'name',
+        birthDate: new Date(),
         phone: '212121',
         password,
       };
@@ -59,6 +68,8 @@ describe('UserService', () => {
       const result = await userService.register(registerDto);
 
       expect(mockRepository.register).toHaveBeenCalledWith({
+        name: registerDto.name,
+        birthDate: registerDto.birthDate,
         phone: registerDto.phone,
         password: expect.stringMatching(/^\$2[aby]\$.{56}$/),
       });

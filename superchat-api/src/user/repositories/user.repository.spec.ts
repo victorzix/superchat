@@ -48,6 +48,8 @@ describe('UserRepository', () => {
   describe('register', () => {
     it('should create and save a new user', async () => {
       const registerDto: RegisterUserDto = {
+        name: 'name',
+        birthDate: new Date(),
         phone: '212121',
         password: await hash('a123sa', 12),
       };

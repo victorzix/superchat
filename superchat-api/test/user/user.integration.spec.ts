@@ -6,6 +6,7 @@ import { DataSource } from 'typeorm';
 import { RegisterUserDto } from '@/user/dto/request/register-user.dto';
 import { BadRequestException } from '@nestjs/common';
 import { testDbConfig } from '../config/test-db.config';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 
 describe('User integration', () => {
   let userController: UserController;
@@ -14,11 +15,18 @@ describe('User integration', () => {
   beforeAll(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
       controllers: [UserController],
+      imports: [
+        JwtModule.register({
+          secret: 'test-secret',
+          signOptions: { expiresIn: '1' },
+        }),
+      ],
       providers: [
         {
           provide: 'USER_SERVICE',
-          useFactory: (ur: UserRepository) => new UserService(ur),
-          inject: ['USER_REPOSITORY'],
+          useFactory: (ur: UserRepository, jwt: JwtService) =>
+            new UserService(ur, jwt),
+          inject: ['USER_REPOSITORY', JwtService],
         },
         {
           provide: 'USER_REPOSITORY',
@@ -47,6 +55,8 @@ describe('User integration', () => {
   describe('register', () => {
     it('should register a user successfully', async () => {
       const dto: RegisterUserDto = {
+        name: 'name',
+        birthDate: new Date(),
         phone: '11999999999',
         password: '123456',
       };
@@ -60,6 +70,8 @@ describe('User integration', () => {
 
     it('should throw when phone already registered', async () => {
       const dto: RegisterUserDto = {
+        name: 'name',
+        birthDate: new Date(),
         phone: '11999999998',
         password: '123456',
       };
