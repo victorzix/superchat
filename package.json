@@ -10,6 +10,9 @@
     "superchat-api/**/*.{ts,js,json}": [
       "eslint --fix",
       "jest --findRelatedTests --bail --passWithNoTests"
+    ],
+    "superchat-front/**/*.{ts,js,jsx,tsx}": [
+      "jest --bail --passWithNoTests"
     ]
   },
   "repository": {
