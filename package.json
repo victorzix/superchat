@@ -8,7 +8,6 @@
   },
   "lint-staged": {
     "superchat-api/**/*.{ts,js,json}": [
-      "eslint --fix",
       "jest --findRelatedTests --bail --passWithNoTests"
     ],
     "superchat-front/**/*.{ts,js,jsx,tsx}": [
