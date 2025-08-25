@@ -20,9 +20,6 @@ export class User {
   @Column('varchar', { nullable: false, unique: false })
   name: string;
 
-  @Column('date', { nullable: false, unique: false })
-  birthDate: Date;
-
   @Column('text', { nullable: true, unique: false })
   profilePicture?: string;
 
