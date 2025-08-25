@@ -1,6 +1,7 @@
 # =========================
 # Node.js / Dependencies
 # =========================
+node_modules/
 /*/node_modules/
 /*/.pnp
 /*/.pnp.*
@@ -92,3 +93,7 @@ pids
 # Vercel
 # =========================
 /*/.vercel
+
+nginx.conf
+docker-compose.yml
+certbot
