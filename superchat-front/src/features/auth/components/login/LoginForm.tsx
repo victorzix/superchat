@@ -5,11 +5,11 @@ import {zodResolver} from '@hookform/resolvers/zod';
 import {loginSchema, LoginFormData} from '../../schemas/loginSchema';
 import {useUser} from '../../hooks/useUser';
 import {useHookFormMask} from 'use-mask-input';
-import {FaEye, FaPhone, FaSpinner} from "react-icons/fa6";
+import {FaEye, FaPhone} from "react-icons/fa6";
 import {TbPassword} from "react-icons/tb";
 import {Input} from '@/components/ui/input';
 import {useEffect, useState} from 'react';
-import {motion, AnimatePresence} from "motion/react";
+import {motion} from "motion/react";
 import Link from "next/link";
 import LoginButton from "@/features/auth/components/login/LoginButton";
 
@@ -30,7 +30,7 @@ export function LoginForm() {
 
   const registerWithMask = useHookFormMask(register)
 
-  const {loginUser, user, isPending} = useUser();
+  const {loginUser, isPending} = useUser();
 
   useEffect(() => {
     const subscription = watch((value) => {
@@ -55,7 +55,8 @@ export function LoginForm() {
                  className="space-y-4 w-3/4 shadow-xl py-8 px-4 rounded-lg md:w-2/4 lg:w-1/4">
       <div className='*:not-first:mt-2'>
         <div className='relative'>
-          <Input disabled={isPending} readOnly={isPending} className='peer ps-9 md:h-13' {...registerWithMask('phone', "(99) [9]9999-9999", {
+          <Input disabled={isPending} readOnly={isPending}
+                 className='peer ps-9 md:h-13' {...registerWithMask('phone', "(99) [9]9999-9999", {
             placeholder: '',
             showMaskOnHover: false,
             showMaskOnFocus: false,
@@ -71,7 +72,8 @@ export function LoginForm() {
 
       <div className='*:not-first:mt-2'>
         <div className='relative'>
-          <Input disabled={isPending} readOnly={isPending} className='peer ps-9 pe-9 md:h-13' type={isPasswordVisible ? 'text' : 'password'} {...register('password')} />
+          <Input disabled={isPending} readOnly={isPending} className='peer ps-9 pe-9 md:h-13'
+                 type={isPasswordVisible ? 'text' : 'password'} {...register('password')} />
           <div
             className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
             <TbPassword size={16} aria-hidden="true"/>
@@ -88,7 +90,8 @@ export function LoginForm() {
       </div>
 
       <div>
-        <Link hidden={isPending} href='/registrar' className='text-xs text-gray-400 md:text-sm'>Ou cadastre-se agora</Link>
+        <Link hidden={isPending} href={'/register'} className='text-xs text-gray-400 md:text-sm'>Ou cadastre-se
+          agora</Link>
       </div>
 
       <LoginButton isValid={isValid} isPending={isPending} phoneNumber={phoneNumber} error={error}/>
