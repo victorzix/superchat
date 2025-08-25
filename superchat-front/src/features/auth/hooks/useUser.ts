@@ -1,15 +1,27 @@
-import {getUserData, login, logout} from '../services/authService';
+import {getUserData, login, logout, register} from '../services/authService';
 import {useRouter} from 'next/navigation';
 import {LoginFormData} from '../schemas/loginSchema';
 import {useAuthStore} from "@/store/authStore";
 import {useStore} from "zustand/react";
 import {useState} from "react";
+import {RegisterFormData} from "@/features/auth/schemas/registerSchema";
 
 export function useUser() {
   const router = useRouter();
 
   const {setUser, user} = useStore(useAuthStore);
   const [isPending, setIsPending] = useState(false);
+
+  async function registerUser(data: RegisterFormData) {
+    setIsPending(true);
+    try {
+      const response = await register(data);
+      setUser(response);
+      router.push('/dashboard');
+    } finally {
+      setIsPending(false);
+    }
+  }
 
   async function loginUser(data: LoginFormData) {
     setIsPending(true);
@@ -44,5 +56,6 @@ export function useUser() {
     logoutUser,
     isPending,
     getUser,
+    registerUser,
   }
 }
