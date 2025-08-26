@@ -20,12 +20,13 @@ import { LoginPayloadDto } from '@/user/dto/request/login-payload.dto';
 import { AuthGuard } from '@/shared/guards/auth.guard';
 import { RegisterUserRequestDto } from '@/user/dto/request/register-user-request.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { USER_SERVICE } from '@/shared/symbols';
 
 @ApiTags('Usuários')
 @Controller('user')
 export class UserController {
   constructor(
-    @Inject('USER_SERVICE') private readonly userService: IUserService,
+    @Inject(USER_SERVICE) private readonly userService: IUserService,
   ) {}
 
   @UsePipes(HashPasswordPipe)

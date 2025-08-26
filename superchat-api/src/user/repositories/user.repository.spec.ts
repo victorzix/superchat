@@ -7,6 +7,7 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaService } from '@/prisma/prisma.service';
 import { hash } from 'bcrypt';
 import { mockUser } from '../../../test/user/mocks';
+import {USER_REPOSITORY} from "@/shared/symbols";
 
 describe('UserRepository', () => {
   let userRepository: IUserRepository;
@@ -19,7 +20,7 @@ describe('UserRepository', () => {
       providers: [
         {
           useClass: UserRepository,
-          provide: 'USER_REPOSITORY',
+          provide: USER_REPOSITORY,
         },
         {
           provide: PrismaService,
@@ -28,7 +29,7 @@ describe('UserRepository', () => {
       ],
     }).compile();
 
-    userRepository = module.get<UserRepository>('USER_REPOSITORY');
+    userRepository = module.get<UserRepository>(USER_REPOSITORY);
   });
 
   afterEach(() => {

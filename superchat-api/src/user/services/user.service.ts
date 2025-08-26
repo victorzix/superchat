@@ -16,12 +16,13 @@ import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import { v2 as Cloudinary } from 'cloudinary';
 import { RegisterUserRequestDto } from '@/user/dto/request/register-user-request.dto';
+import {CLOUDINARY, USER_REPOSITORY} from "@/shared/symbols";
 
 @Injectable()
 export class UserService implements IUserService {
   constructor(
-    @Inject('USER_REPOSITORY') private readonly repository: IUserRepository,
-    @Inject('CLOUDINARY') private readonly cloudinary: typeof Cloudinary,
+    @Inject(USER_REPOSITORY) private readonly repository: IUserRepository,
+    @Inject(CLOUDINARY) private readonly cloudinary: typeof Cloudinary,
     private jwtService: JwtService,
   ) {}
 

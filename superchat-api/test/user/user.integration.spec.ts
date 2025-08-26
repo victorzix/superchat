@@ -7,6 +7,7 @@ import { BadRequestException } from '@nestjs/common';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { v2 as Cloudinary } from 'cloudinary';
 import { PrismaTestService } from '@/prisma/test/prisma.test.service';
+import {CLOUDINARY, USER_REPOSITORY, USER_SERVICE} from "@/shared/symbols";
 
 describe('User integration', () => {
   let userController: UserController;
@@ -24,23 +25,23 @@ describe('User integration', () => {
       providers: [
         PrismaTestService,
         {
-          provide: 'USER_SERVICE',
+          provide: USER_SERVICE,
           useFactory: (
             ur: UserRepository,
             jwt: JwtService,
             cloudinary: typeof Cloudinary,
           ) => new UserService(ur, cloudinary, jwt),
-          inject: ['USER_REPOSITORY', JwtService, 'CLOUDINARY'],
+          inject: [USER_REPOSITORY, JwtService, CLOUDINARY],
         },
         {
-          provide: 'USER_REPOSITORY',
+          provide: USER_REPOSITORY,
           useFactory: (prismaTest: PrismaTestService) => {
             return new UserRepository(prismaTest);
           },
           inject: [PrismaTestService],
         },
         {
-          provide: 'CLOUDINARY',
+          provide: CLOUDINARY,
           useValue: {
             uploader: {
               upload_stream: jest.fn().mockImplementation(() => {

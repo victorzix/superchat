@@ -8,11 +8,12 @@ import {
 import { IUserService } from '../../user/interfaces/user.service.interface';
 import { JwtService } from '@nestjs/jwt';
 import { Request, Response } from 'express';
+import {USER_SERVICE} from "@/shared/symbols";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    @Inject('USER_SERVICE')
+    @Inject(USER_SERVICE)
     private readonly userService: IUserService,
     private readonly jwtService: JwtService,
   ) {}
