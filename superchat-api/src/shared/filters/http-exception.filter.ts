@@ -13,6 +13,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger('ExceptionFilter');
 
   catch(exception: unknown, host: ArgumentsHost) {
+    console.log(exception);
     const context = host.switchToHttp();
     const response = context.getResponse<Response>();
 

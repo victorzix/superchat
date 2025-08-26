@@ -3,6 +3,7 @@ import { IUserRepository } from '../interfaces/user.repository.interface';
 import {
   BadRequestException,
   Inject,
+  Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -16,6 +17,7 @@ import { Response } from 'express';
 import { v2 as Cloudinary } from 'cloudinary';
 import { RegisterUserRequestDto } from '@/user/dto/request/register-user-request.dto';
 
+@Injectable()
 export class UserService implements IUserService {
   constructor(
     @Inject('USER_REPOSITORY') private readonly repository: IUserRepository,
@@ -51,7 +53,7 @@ export class UserService implements IUserService {
           },
         );
 
-        upload.end(file.buffer); // <── manda o buffer aqui
+        upload.end(file.buffer);
       });
     }
 

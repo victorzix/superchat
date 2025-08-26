@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { DatabaseModule } from './providers/database/database.module';
 import { UserModule } from './user/user.module';
+import { PrismaModule } from '@/prisma/prisma.module';
 
 @Module({
   imports: [
@@ -21,7 +21,7 @@ import { UserModule } from './user/user.module';
       global: true,
       secret: process.env.JWT_ACCESS_TOKEN_SECRET,
     }),
-    DatabaseModule,
+    PrismaModule,
     UserModule,
   ],
 })
