@@ -17,6 +17,18 @@ export class User {
   @Column('varchar', { nullable: false })
   password: string;
 
+  @Column('varchar', { nullable: false, unique: false })
+  name: string;
+
+  @Column('text', { nullable: true, unique: false })
+  profilePicture?: string;
+
+  @Column('boolean', { nullable: false, unique: false, default: true })
+  isActive: boolean;
+
+  @Column('varchar', { nullable: true, unique: false })
+  status?: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

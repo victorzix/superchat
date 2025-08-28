@@ -1,6 +1,5 @@
 import { User } from '../entities/user.entity';
 import { RegisterUserDto } from '@/user/dto/request/register-user.dto';
-import { Response } from 'express';
 
 export interface IUserRepository {
   register: (dto: RegisterUserDto) => Promise<User>;

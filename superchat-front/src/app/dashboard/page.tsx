@@ -11,11 +11,12 @@ export default function Dashboard() {
         await logoutUser();
       });
     }
-
   }, [user, getUser, logoutUser]);
+
+  if (!user) return null;
   return (
     <>
-      {user?.phone}
+      {user.phone}
     </>
   )
 }

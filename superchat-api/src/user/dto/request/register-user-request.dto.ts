@@ -1,8 +1,8 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsString } from 'class-validator';
 import { Sanitize } from '@/shared/decorators/sanitize.decorator';
 
-export class RegisterUserDto {
+export class RegisterUserRequestDto {
   @ApiProperty()
   @IsString()
   @Sanitize()
@@ -17,10 +17,4 @@ export class RegisterUserDto {
   @IsString()
   @Sanitize()
   name: string;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsString()
-  @Sanitize()
-  profilePicture?: string;
 }

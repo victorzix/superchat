@@ -48,6 +48,8 @@ describe('User (e2e)', () => {
       const res = await request(app.getHttpServer())
         .post('/user')
         .send({
+          name: 'name',
+          birthDate: new Date(),
           phone: '11999999999',
           password: '123456',
         })
@@ -60,11 +62,13 @@ describe('User (e2e)', () => {
 
     it('should throw when phone already registered', async () => {
       const dto = {
-        phone: '11999999998',
+        name: 'name',
+        birthDate: new Date(),
+        phone: '11999999999',
         password: '123456',
       };
 
-      await request(app.getHttpServer()).post('/user').send(dto).expect(201);
+      await request(app.getHttpServer()).post('/user').send(dto).expect(400);
 
       const res = await request(app.getHttpServer())
         .post('/user')

@@ -9,10 +9,9 @@ export default function Home() {
   const {user} = useUser()
 
   useEffect(() => {
-    console.log(user)
     if (user) router.push('/dashboard');
     else router.push('/login');
-  }, [user]);
+  }, [user, router]);
 
   return (
     <div>
