@@ -8,7 +8,7 @@ import {
 import { IUserService } from '../../user/interfaces/user.service.interface';
 import { JwtService } from '@nestjs/jwt';
 import { Request, Response } from 'express';
-import {USER_SERVICE} from "@/shared/symbols";
+import { USER_SERVICE } from '@/shared/symbols';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -33,7 +33,7 @@ export class AuthGuard implements CanActivate {
         }
       }
       const payload = await this.jwtService.verifyAsync(token);
-      const user = await this.userService.getData(payload.sub);
+      const user = await this.userService.getData({ id: payload.sub });
       if (!user) throw new UnauthorizedException('Usuário não encontrado');
       request.user = payload;
       return true;

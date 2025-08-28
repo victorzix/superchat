@@ -1,0 +1,2 @@
+export const CONTACT_REPOSITORY = Symbol('CONTACT_REPOSITORY');
+export const CONTACT_SERVICE = Symbol('CONTACT_SERVICE');

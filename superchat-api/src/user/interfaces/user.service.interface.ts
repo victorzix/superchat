@@ -12,7 +12,13 @@ export interface IUserService {
   ) => Promise<RegisterUserResponseDto>;
   update: () => Promise<User>;
   delete: () => Promise<void>;
-  getData: (id: string) => Promise<RegisterUserResponseDto>;
+  getData: ({
+    id,
+    phone,
+  }: {
+    id?: string;
+    phone?: string;
+  }) => Promise<RegisterUserResponseDto>;
   login: (res: Response, dto: LoginPayloadDto) => Promise<void>;
   refresh: (res: Response, refreshToken: string) => Promise<void>;
 }

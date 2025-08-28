@@ -71,8 +71,8 @@ export class UserService implements IUserService {
   update: () => Promise<User>;
   delete: () => Promise<void>;
 
-  async getData(id: string): Promise<RegisterUserResponseDto> {
-    const user = await this.repository.getData({ id });
+  async getData({ id, phone }: {id?: string, phone?: string}): Promise<RegisterUserResponseDto> {
+    const user = await this.repository.getData({ id, phone });
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
     }

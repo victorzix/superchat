@@ -50,7 +50,7 @@ export class UserController {
   @UseGuards(AuthGuard)
   @Get()
   async getData(@Req() req: Request) {
-    return await this.userService.getData(req.user.sub);
+    return await this.userService.getData({id: req.user.sub});
   }
 
   @UseGuards(AuthGuard)

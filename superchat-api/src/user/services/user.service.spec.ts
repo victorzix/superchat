@@ -130,7 +130,7 @@ describe('UserService', () => {
     it('should return an user by its id', async () => {
       mockRepository.getData.mockResolvedValue(mockUser);
 
-      const result = await userService.getData('123');
+      const result = await userService.getData({id: '123'});
 
       expect(result).toBeDefined();
       expect(result).toHaveProperty('id');
@@ -140,7 +140,7 @@ describe('UserService', () => {
     it('should throw not found if user does not exist', async () => {
       mockRepository.getData.mockResolvedValue(null);
 
-      await expect(userService.getData('123')).rejects.toThrow(
+      await expect(userService.getData({id: '123'})).rejects.toThrow(
         NotFoundException,
       );
 

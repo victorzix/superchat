@@ -6,6 +6,7 @@ export class UserBuilder {
     return {
       id: user.id,
       phone: user.phone,
+      name: user.name,
       profilePicture: user.profilePicture,
     };
   }
