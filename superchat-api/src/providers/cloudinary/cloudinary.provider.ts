@@ -1,7 +1,8 @@
 import { v2 as cloudinary } from 'cloudinary';
+import {CLOUDINARY} from "@/shared/symbols";
 
 export const CloudinaryProvider = {
-  provide: 'CLOUDINARY',
+  provide: CLOUDINARY,
   useFactory: () => {
     cloudinary.config({
       cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

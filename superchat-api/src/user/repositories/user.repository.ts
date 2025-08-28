@@ -17,7 +17,7 @@ export class UserRepository implements IUserRepository {
 
   async getData({ id, phone }: { id?: string; phone?: string }): Promise<User> {
     return this.db.user.findFirst({
-      where: { OR: [{ id }, { phone }] },
+      where: { isActive: true, OR: [{ id }, { phone: { contains: phone } }] },
     });
   }
 }

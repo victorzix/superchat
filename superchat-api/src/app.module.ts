@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from './user/user.module';
 import { PrismaModule } from '@/prisma/prisma.module';
+import { ContactModule } from '@/contact/contact.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { PrismaModule } from '@/prisma/prisma.module';
     }),
     PrismaModule,
     UserModule,
+    ContactModule,
   ],
 })
 export class AppModule {}

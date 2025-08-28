@@ -1,4 +1,16 @@
 services:
+  database-tests:
+    image: postgres:latest
+    container_name: superchat-test
+    restart: always
+    shm_size: 128mb
+    environment:
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_USER=test
+      - POSTGRES_DB=test
+    ports:
+      - '5433:5432'
+
   database:
     env_file:
       - path: './.env'
@@ -25,26 +37,33 @@ services:
         required: true
     depends_on:
       - database
-    expose:
-      - "3001"
 
   frontend:
     build: ./superchat-front
     container_name: superchat-front
     restart: always
-    expose:
-      - "3000"
 
   nginx:
     image: nginx:latest
     container_name: superchat-nginx
     restart: always
-    ports:
-      - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    ports:
+      - "80:80"
+      - "443:443"
     depends_on:
       - backend
       - frontend
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    command: certonly --webroot -w /var/www/certbot --force-renewal --email victorphaelnev@gmail.com -d victoraphael.com.br -d api.superchat.victoraphael.com.br -d superchat.victoraphael.com.br --agree-tos
 volumes:
   postgres_data:

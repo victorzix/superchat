@@ -6,6 +6,7 @@ import { UserService } from '@/user/services/user.service';
 import { JwtModule } from '@nestjs/jwt';
 import { mockUser } from '../../../test/user/mocks';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
+import {CLOUDINARY, USER_REPOSITORY, USER_SERVICE} from "@/shared/symbols";
 
 describe('UserService', () => {
   let userService: IUserService;
@@ -28,7 +29,7 @@ describe('UserService', () => {
       ],
       providers: [
         {
-          provide: 'CLOUDINARY',
+          provide: CLOUDINARY,
           useValue: {
             uploader: {
               upload_stream: jest.fn().mockImplementation(() => {
@@ -41,16 +42,16 @@ describe('UserService', () => {
         },
         {
           useValue: mockRepository,
-          provide: 'USER_REPOSITORY',
+          provide: USER_REPOSITORY,
         },
         {
-          provide: 'USER_SERVICE',
+          provide: USER_SERVICE,
           useClass: UserService,
         },
       ],
     }).compile();
 
-    userService = module.get<UserService>('USER_SERVICE');
+    userService = module.get<UserService>(USER_SERVICE);
   });
 
   afterEach(() => {
@@ -129,7 +130,7 @@ describe('UserService', () => {
     it('should return an user by its id', async () => {
       mockRepository.getData.mockResolvedValue(mockUser);
 
-      const result = await userService.getData('123');
+      const result = await userService.getData({id: '123'});
 
       expect(result).toBeDefined();
       expect(result).toHaveProperty('id');
@@ -139,7 +140,7 @@ describe('UserService', () => {
     it('should throw not found if user does not exist', async () => {
       mockRepository.getData.mockResolvedValue(null);
 
-      await expect(userService.getData('123')).rejects.toThrow(
+      await expect(userService.getData({id: '123'})).rejects.toThrow(
         NotFoundException,
       );
 

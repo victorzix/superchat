@@ -7,6 +7,7 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaService } from '@/prisma/prisma.service';
 import { hash } from 'bcrypt';
 import { mockUser } from '../../../test/user/mocks';
+import { USER_REPOSITORY } from '@/shared/symbols';
 
 describe('UserRepository', () => {
   let userRepository: IUserRepository;
@@ -19,7 +20,7 @@ describe('UserRepository', () => {
       providers: [
         {
           useClass: UserRepository,
-          provide: 'USER_REPOSITORY',
+          provide: USER_REPOSITORY,
         },
         {
           provide: PrismaService,
@@ -28,7 +29,7 @@ describe('UserRepository', () => {
       ],
     }).compile();
 
-    userRepository = module.get<UserRepository>('USER_REPOSITORY');
+    userRepository = module.get<UserRepository>(USER_REPOSITORY);
   });
 
   afterEach(() => {
@@ -98,7 +99,10 @@ describe('UserRepository', () => {
 
         expect(prisma.user.findFirst).toHaveBeenCalledTimes(1);
         expect(prisma.user.findFirst).toHaveBeenCalledWith({
-          where: { OR: [{ id: '123' }, { phone: undefined }] },
+          where: {
+            isActive: true,
+            OR: [{ id: '123' }, { phone: { contains: undefined } }],
+          },
         });
         expect(result).toEqual(mockUser);
       });
@@ -109,7 +113,10 @@ describe('UserRepository', () => {
         const result = await userRepository.getData({ id: 'nonexistent' });
 
         expect(prisma.user.findFirst).toHaveBeenCalledWith({
-          where: { OR: [{ id: 'nonexistent' }, { phone: undefined }] },
+          where: {
+            isActive: true,
+            OR: [{ id: 'nonexistent' }, { phone: { contains: undefined } }],
+          },
         });
         expect(result).toBeNull();
       });
@@ -123,7 +130,10 @@ describe('UserRepository', () => {
 
         expect(prisma.user.findFirst).toHaveBeenCalledTimes(1);
         expect(prisma.user.findFirst).toHaveBeenCalledWith({
-          where: { OR: [{ id: undefined }, { phone: '11999999999' }] },
+          where: {
+            isActive: true,
+            OR: [{ id: undefined }, { phone: { contains: '11999999999' } }],
+          },
         });
         expect(result).toEqual(mockUser);
         expect(result.phone).toBe('11999999999');
