@@ -28,6 +28,20 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  mongodb:
+    env_file:
+      - path: './.env'
+        required: true
+    image: mongo:latest
+    container_name: mongodb_container
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
+
   backend:
     build: ./superchat-api
     container_name: superchat-app
@@ -65,5 +79,7 @@ services:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
     command: certonly --webroot -w /var/www/certbot --force-renewal --email victorphaelnev@gmail.com -d victoraphael.com.br -d api.superchat.victoraphael.com.br -d superchat.victoraphael.com.br --agree-tos
+
 volumes:
   postgres_data:
+  mongodb_data:
