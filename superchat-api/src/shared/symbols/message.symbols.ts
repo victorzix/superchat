@@ -1,0 +1,2 @@
+export const MESSAGE_SERVICE = Symbol('MESSAGE_SERVICE');
+export const MESSAGE_REPOSITORY = Symbol('MESSAGE_REPOSITORY');
