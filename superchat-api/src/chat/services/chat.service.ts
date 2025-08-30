@@ -5,7 +5,7 @@ import * as crypto from 'crypto';
 import { Chat } from '../../../generated/prisma';
 import { ChatKeys } from '@/chat/entities/chat.entity';
 import { IChatService } from '@/chat/interfaces/chat.service.interface';
-import {CreateChatDto} from "@/chat/dto/request/create-chat.dto";
+import { CreateChatDto } from '@/chat/dto/request/create-chat.dto';
 
 @Injectable()
 export class ChatService implements IChatService {
