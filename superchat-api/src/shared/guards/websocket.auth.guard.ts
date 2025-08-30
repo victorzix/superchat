@@ -27,11 +27,10 @@ export class WsAuthGuard implements CanActivate {
     try {
       if (!token) {
         if (refreshToken) {
-          const payload = await this.userService.refreshWs(
+          client.data.user = await this.userService.refreshWs(
             client,
             refreshToken,
           );
-          client.data.user = payload; // salva no socket
           return true;
         }
         throw new UnauthorizedException('Token não encontrado');
@@ -45,8 +44,10 @@ export class WsAuthGuard implements CanActivate {
       return true;
     } catch (err) {
       if (err.name === 'TokenExpiredError' && refreshToken) {
-        const payload = await this.userService.refreshWs(client, refreshToken);
-        client.data.user = payload;
+        client.data.user = await this.userService.refreshWs(
+          client,
+          refreshToken,
+        );
         return true;
       }
       throw new UnauthorizedException('Faça o login novamente');
