@@ -27,7 +27,7 @@ export default class ChatRepository implements IChatRepository {
     return this.prisma.chat.findMany({
       where: {
         members: {
-          every: { id: memberId },
+          some: { id: memberId },
         },
       },
       include: {

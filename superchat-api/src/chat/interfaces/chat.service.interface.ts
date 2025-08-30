@@ -1,6 +1,5 @@
 import { CreateChatDto } from '@/chat/dto/request/create-chat.dto';
-import { Chat } from '../../../generated/prisma';
-import { ChatKeys } from '@/chat/entities/chat.entity';
+import { Chat, ChatKeys } from '@/chat/entities/chat.entity';
 
 export interface IChatService {
   create(dto: CreateChatDto): Promise<Chat>;
@@ -10,5 +9,4 @@ export interface IChatService {
   getChat(id: string): Promise<Chat>;
 
   getChatKeys(chatId: string): Promise<ChatKeys>;
-
 }
