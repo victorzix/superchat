@@ -6,6 +6,7 @@ import { PrismaModule } from '@/prisma/prisma.module';
 import { ContactModule } from '@/contact/contact.module';
 import { MessageModule } from '@/message/message.module';
 import { ChatModule } from '@/chat/chat.module';
+import { WebSocketModule } from '@/websocket/websocket.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { ChatModule } from '@/chat/chat.module';
     ContactModule,
     MessageModule,
     ChatModule,
+    WebSocketModule,
   ],
 })
 export class AppModule {}

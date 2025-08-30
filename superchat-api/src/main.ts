@@ -4,6 +4,7 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 
 const port = process.env.PORT;
 
@@ -43,6 +44,8 @@ async function bootstrap() {
     },
   });
 
+  const ioAdapter = new IoAdapter(app);
+  app.useWebSocketAdapter(ioAdapter);
   await app.listen(port, '0.0.0.0', () => {
     Logger.debug(
       `Servidor rodando em http://localhost:${port}`,
