@@ -8,23 +8,34 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {ChevronDownIcon, TrashIcon} from "lucide-react";
 import {BiBell, BiBlock, BiPin} from "react-icons/bi";
+import {IChat} from "@/features/chat/interfaces/chat";
+import {useUser} from "@/features/auth/hooks/useUser";
+import {useSelectedChat} from "@/features/chat/hooks/useChat";
+import {cn} from "@/lib/utils";
 
 interface ChatListItemProps {
-  chat: any // Will become Chat interface later
+  chat: IChat
 }
 
 export default function ChatListItem({chat}: ChatListItemProps) {
+  const {user} = useUser();
+  const {setChat, selectedChat} = useSelectedChat();
+
+  if (!user) return null;
+
+  const chatMember = chat.members.find((chatMember) => user.id !== chatMember.id)
+
   return (
-    <li className='relative flex border-b w-full p-4 items-center gap-3 cursor-pointer hover:bg-gray-100 rounded-lg'>
+    <li className={cn('relative flex border-b w-full p-4 items-center gap-3 cursor-pointer hover:bg-gray-100 rounded-lg', selectedChat && selectedChat.id === chat.id && 'bg-gray-100')} onClick={() => setChat(chat)}>
       <Avatar className='w-10 h-10'>
-        <AvatarImage src={chat.picture ?? chat.receiver?.profilePicture} alt="avatar"/>
-        <AvatarFallback>{chat.name ?? chat.receiver?.name}</AvatarFallback>
+        <AvatarImage src={chatMember?.profilePicture} alt="avatar"/>
+        <AvatarFallback>{chatMember?.phone}</AvatarFallback>
       </Avatar>
 
       <div className='flex flex-col truncate'>
-        <span className='text-md font-semibold'>{chat.name ?? chat.receiver?.name}</span>
+        <span className='text-md font-semibold'>{chatMember?.name}</span>
         <span
-          className='text-sm font-light'>{chat.isGroup && chat.lastSender.name + ':'} Last message</span> {/* TBD */}
+          className='text-sm font-light'>Last message</span> {/* TBD */}
       </div>
 
       <DropdownMenu>

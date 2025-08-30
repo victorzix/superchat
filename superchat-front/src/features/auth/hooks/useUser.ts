@@ -9,7 +9,7 @@ import {RegisterFormData} from "@/features/auth/schemas/registerSchema";
 export function useUser() {
   const router = useRouter();
 
-  const {setUser, user} = useStore(useAuthStore);
+  const {setUser, user, reset} = useStore(useAuthStore);
   const [isPending, setIsPending] = useState(false);
 
   async function registerUser(data: RegisterFormData) {
@@ -37,6 +37,7 @@ export function useUser() {
 
   async function logoutUser() {
     try {
+      reset();
       await logout();
     } finally {
       router.push('/login')

@@ -8,7 +8,7 @@ interface SidebarProps {
 
 export default function Sidebar({children}: SidebarProps) {
   return (
-    <div className='w-1/4 h-full flex'>
+    <div className='w-2/5 h-full flex'>
       <OptionBar/>
       <div className='flex-1'>
         <Header/>
