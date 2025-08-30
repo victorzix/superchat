@@ -58,5 +58,6 @@ export class UserController {
   async logout(@Res() res: Response) {
     res.clearCookie('refresh_token');
     res.clearCookie('access_token');
+    return res.status(HttpStatus.OK).end();
   }
 }

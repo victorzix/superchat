@@ -3,4 +3,5 @@ export interface RegisterUserResponseDto {
   phone: string;
   name: string;
   profilePicture?: string;
+  status?: string;
 }

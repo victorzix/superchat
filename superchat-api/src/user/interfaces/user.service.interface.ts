@@ -3,6 +3,7 @@ import { RegisterUserResponseDto } from '@/user/dto/responses/register-user-resp
 import { LoginPayloadDto } from '@/user/dto/request/login-payload.dto';
 import { Response } from 'express';
 import { RegisterUserRequestDto } from '@/user/dto/request/register-user-request.dto';
+import { Socket } from 'socket.io';
 
 export interface IUserService {
   register: (
@@ -21,4 +22,6 @@ export interface IUserService {
   }) => Promise<RegisterUserResponseDto>;
   login: (res: Response, dto: LoginPayloadDto) => Promise<void>;
   refresh: (res: Response, refreshToken: string) => Promise<void>;
+
+  refreshWs(client: Socket, refreshToken: string): Promise<any>;
 }

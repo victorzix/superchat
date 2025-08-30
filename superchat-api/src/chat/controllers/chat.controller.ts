@@ -1,13 +1,5 @@
 import { ApiTags } from '@nestjs/swagger';
-import {
-  Body,
-  Controller,
-  Get,
-  Inject,
-  Param,
-  Post,
-} from '@nestjs/common';
-import { AuthGuard } from '@/shared/guards/auth.guard';
+import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
 import { CHAT_SERVICE } from '@/shared/symbols';
 import { IChatService } from '@/chat/interfaces/chat.service.interface';
 import { CreateChatDto } from '@/chat/dto/request/create-chat.dto';

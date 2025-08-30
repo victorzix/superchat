@@ -16,7 +16,8 @@ import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import { v2 as Cloudinary } from 'cloudinary';
 import { RegisterUserRequestDto } from '@/user/dto/request/register-user-request.dto';
-import {CLOUDINARY, USER_REPOSITORY} from "@/shared/symbols";
+import { CLOUDINARY, USER_REPOSITORY } from '@/shared/symbols';
+import { Socket } from 'socket.io';
 
 @Injectable()
 export class UserService implements IUserService {
@@ -71,7 +72,13 @@ export class UserService implements IUserService {
   update: () => Promise<User>;
   delete: () => Promise<void>;
 
-  async getData({ id, phone }: {id?: string, phone?: string}): Promise<RegisterUserResponseDto> {
+  async getData({
+    id,
+    phone,
+  }: {
+    id?: string;
+    phone?: string;
+  }): Promise<RegisterUserResponseDto> {
     const user = await this.repository.getData({ id, phone });
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
@@ -113,6 +120,24 @@ export class UserService implements IUserService {
         sameSite: 'lax',
         maxAge: 1000 * 60 * 60 * 24 * 7,
       });
+    } catch (error) {
+      throw new UnauthorizedException('Refresh token inválido ou expirado');
+    }
+  }
+
+  async refreshWs(client: Socket, refreshToken: string): Promise<any> {
+    try {
+      const payload = await this.jwtService.verifyAsync(refreshToken);
+      const newAccessToken = await this.jwtService.signAsync(
+        { sub: payload.sub, phone: payload.phone },
+        { expiresIn: '120m' },
+      );
+
+      client.emit('auth:refresh', { access_token: newAccessToken });
+
+      client.data.user = payload;
+
+      return payload;
     } catch (error) {
       throw new UnauthorizedException('Refresh token inválido ou expirado');
     }
