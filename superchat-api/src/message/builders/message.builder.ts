@@ -7,6 +7,7 @@ export class MessageBuilder {
     textDecrypt: () => string,
   ): MessageResponseDto {
     return {
+      _id: dto._id,
       senderId: dto.senderId,
       chatId: dto.chatId,
       text: textDecrypt(),

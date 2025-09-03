@@ -6,6 +6,8 @@ export type MessageDocument = HydratedDocument<Message>;
 
 @Schema({ timestamps: true })
 export class Message extends Document {
+  _id: string;
+
   @Prop({ type: String, required: true })
   senderId: string;
 
@@ -15,7 +17,7 @@ export class Message extends Document {
   @Prop({
     type: Number,
     enum: MessageStatus,
-    default: MessageStatus.PENDING,
+    default: MessageStatus.SENT,
   })
   status: MessageStatus;
 

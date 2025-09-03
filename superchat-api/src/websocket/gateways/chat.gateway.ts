@@ -8,8 +8,9 @@ import { Socket } from 'socket.io';
 import { Inject, UseFilters, UseGuards } from '@nestjs/common';
 import { WsAuthGuard } from '@/shared/guards/websocket.auth.guard';
 import { WsExceptionFilter } from '@/shared/filters/ws-exception.filter';
-import { CHAT_SERVICE } from '@/shared/symbols';
+import { CHAT_SERVICE, MESSAGE_SERVICE } from '@/shared/symbols';
 import { IChatService } from '@/chat/interfaces/chat.service.interface';
+import { IMessageService } from '@/message/interfaces/message.service.interface';
 
 @UseFilters(new WsExceptionFilter())
 @WebSocketGateway(80, {
@@ -20,6 +21,7 @@ import { IChatService } from '@/chat/interfaces/chat.service.interface';
 export class ChatGateway {
   constructor(
     @Inject(CHAT_SERVICE) private readonly chatService: IChatService,
+    @Inject(MESSAGE_SERVICE) private readonly messageService: IMessageService,
   ) {}
 
   @UseGuards(WsAuthGuard)
@@ -38,17 +40,22 @@ export class ChatGateway {
   }
 
   @UseGuards(WsAuthGuard)
-  @SubscribeMessage('mensagem')
+  @SubscribeMessage('message')
   async sendMessage(
     @MessageBody() data: { chatId: string; message: string },
     @ConnectedSocket() client: Socket,
   ) {
     const userId = client.data.user.sub;
 
-    client.to(`chat_${data.chatId}`).emit('mensagem', {
+    const message = await this.messageService.sendMessage(
+      { messageText: data.message, chatId: data.chatId },
+      userId,
+    );
+
+    client.to(`chat_${data.chatId}`).emit('message', {
       chatId: data.chatId,
       from: userId,
-      message: data.message,
+      message,
       timestamp: new Date(),
     });
 

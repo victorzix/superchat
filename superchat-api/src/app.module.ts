@@ -7,6 +7,8 @@ import { ContactModule } from '@/contact/contact.module';
 import { MessageModule } from '@/message/message.module';
 import { ChatModule } from '@/chat/chat.module';
 import { WebSocketModule } from '@/websocket/websocket.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-yet';
 
 @Module({
   imports: [
@@ -29,6 +31,18 @@ import { WebSocketModule } from '@/websocket/websocket.module';
     UserModule,
     ContactModule,
     MessageModule,
+    CacheModule.registerAsync({
+      isGlobal: true,
+      useFactory: async () => ({
+        store: await redisStore({
+          socket: {
+            host: process.env.REDIS_MESSAGES_HOST,
+            port: +process.env.REDIS_MESSAGES_PORT,
+          },
+          password: process.env.REDIS_MESSAGES_PASSWORD,
+        }),
+      }),
+    }),
     ChatModule,
     WebSocketModule,
   ],
