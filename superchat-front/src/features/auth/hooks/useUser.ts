@@ -5,6 +5,7 @@ import {useAuthStore} from "@/store/authStore";
 import {useStore} from "zustand/react";
 import {useState} from "react";
 import {RegisterFormData} from "@/features/auth/schemas/registerSchema";
+import {AxiosError} from "axios";
 
 export function useUser() {
   const router = useRouter();
@@ -45,10 +46,18 @@ export function useUser() {
   }
 
   async function getUser() {
-    setIsPending(true)
-    const userData = await getUserData();
-    setUser(userData);
-    setIsPending(false)
+    try {
+      setIsPending(true)
+      const userData = await getUserData();
+      setUser(userData);
+    } catch (err) {
+      if (err instanceof AxiosError && err.status === 401) {
+        reset();
+        router.push('/login')
+      }
+    } finally {
+      setIsPending(false)
+    }
   }
 
   return {

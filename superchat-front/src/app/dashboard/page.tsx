@@ -7,7 +7,6 @@ import Sidebar from "@/features/dashboard/components/sidebar";
 import RecentChats from "@/features/chat/components/recentChats";
 import {useSidebar} from "@/features/dashboard/hooks/useSidebar";
 import Chat from "@/features/chat/components/chat";
-import {io, Socket} from "socket.io-client";
 import {useSocket} from "@/hooks/useSocket";
 
 export default function Dashboard() {
@@ -22,18 +21,10 @@ export default function Dashboard() {
       socket?.emit('connectUser');
     });
 
-    socket.on('connected', (data) => {
-      console.log('Entrou em todas as salas:', data.joinedChats);
-    });
-
-    socket.on('mensagem', (data) => {
-      console.log('Nova mensagem recebida', data);
-    });
-
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
     if (!user) {

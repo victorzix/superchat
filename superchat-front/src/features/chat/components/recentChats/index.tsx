@@ -7,10 +7,8 @@ export default function RecentChats() {const {user} = useUser();
     enabled: !!user
   })
 
-
-
   return (
-    <ol className='px-3 py-1'>
+    <ol className='px-3 py-1 flex flex-col gap-2'>
       {chats && chats.map(chat => <ChatListItem key={chat.id} chat={chat}/>)}
     </ol>
   )
