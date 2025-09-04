@@ -52,9 +52,16 @@ export class MessageService implements IMessageService {
       `chat_${dto.chatId}:messages`,
     );
 
-    cachedMessages.push(buildedMessage);
+    if (cachedMessages) {
+      cachedMessages.push(buildedMessage);
+      await this.cacheManager.set(
+        `chat_${dto.chatId}:messages`,
+        cachedMessages,
+      );
+    } else {
+      await this.cacheManager.set(`chat_${dto.chatId}:messages`, [message]);
+    }
 
-    await this.cacheManager.set(`chat_${dto.chatId}:messages`, cachedMessages);
     return buildedMessage;
   }
 
@@ -80,7 +87,11 @@ export class MessageService implements IMessageService {
       );
     });
 
-    await this.cacheManager.set(`chat_${chatId}:messages`, buildedMessages, 5 * 24 * 60 * 60 * 1000);
+    await this.cacheManager.set(
+      `chat_${chatId}:messages`,
+      buildedMessages,
+      5 * 24 * 60 * 60 * 1000,
+    );
 
     return buildedMessages;
   }

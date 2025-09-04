@@ -1,6 +1,7 @@
 import {IMessage} from "@/features/message/interfaces/message";
 import {useCallback, useState} from "react";
 import {listMessages} from "@/features/message/services/messageService";
+import {MessageStatus} from "@/features/message/enums/MessageStatus";
 
 export function useMessage() {
   const [isListMessagePending, setIsListMessagePending] = useState(false);
@@ -11,7 +12,7 @@ export function useMessage() {
       setIsListMessagePending(true);
       const messages = await listMessages(chatId);
       setMessageHistory(messages);
-    } catch (err) {
+    } catch {
       setMessageHistory([])
     } finally {
       setIsListMessagePending(false);
@@ -26,10 +27,21 @@ export function useMessage() {
     });
   }, [])
 
+  const updateMessageStatus = useCallback((tempId: string, status: MessageStatus, newMessage?: IMessage) => {
+    setMessageHistory(prev =>
+      prev.map(msg =>
+        msg._id === tempId
+          ? { ...msg, status, _id: newMessage?._id ?? msg._id }
+          : msg
+      )
+    );
+  }, []);
+
   return {
     isListMessagePending,
     messageHistory,
     getMessageHistory,
     handleSendMessage,
+    updateMessageStatus,
   }
 }

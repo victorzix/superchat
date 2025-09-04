@@ -13,7 +13,7 @@ import {useMessage} from "@/features/message/hooks/useMessage";
 export default function Chat() {
   const {user} = useUser();
   const {selectedChat} = useSelectedChat();
-  const {messageHistory, getMessageHistory, isListMessagePending, handleSendMessage} = useMessage();
+  const {messageHistory, getMessageHistory, isListMessagePending, handleSendMessage, updateMessageStatus} = useMessage();
   const socket = useSocket();
   const [message, setMessage] = useState('');
 
@@ -24,14 +24,15 @@ export default function Chat() {
   }, [socket, handleSendMessage]);
 
   useEffect(() => {
-    if(selectedChat) getMessageHistory(selectedChat.id).catch(err => console.error(err))
+    if (selectedChat) getMessageHistory(selectedChat.id).catch(err => console.error(err))
   }, [selectedChat, getMessageHistory]);
 
   function sendMessage(msg: string) {
     if (!user || !selectedChat || !msg.trim()) return;
 
+    const tempId = `temp_id_${Date.now()}`
     const tempMessage: IMessage = {
-      _id: `temp_id_${Date.now()}`,
+      _id: tempId,
       chatId: selectedChat.id,
       text: msg.trim(),
       senderId: user.id,
@@ -39,21 +40,29 @@ export default function Chat() {
       status: MessageStatus.PENDING
     };
 
-    // Adiciona mensagem temporária
     handleSendMessage(tempMessage);
 
-    // Envia via socket
-    socket.emit('message', {chatId: selectedChat.id, message: msg.trim()});
+    socket.emit('message', {chatId: selectedChat.id, message: msg.trim(), tempId});
   }
+
+  useEffect(() => {
+    socket.on('messageStatus', (data: { tempId: string; status: MessageStatus; message: IMessage }) => {
+      updateMessageStatus(data.tempId, data.status, data.message);
+    });
+
+    return () => {
+      socket.off('messageStatus');
+    };
+  }, [socket, updateMessageStatus])
 
 
   return (
-    <div className='flex flex-col px-3 py-4 border-l w-full'>
+    <div className='flex flex-col px-3 py-4 border-l w-full h-full'>
       {selectedChat &&
           <>
               <Header chat={selectedChat}/>
 
-              <div className='mt-auto flex flex-col gap-2'>
+              <div className='mt-auto flex flex-col gap-2 w-full overflow-y-auto'>
                 {messageHistory.map((msg) => <Message key={msg._id} message={msg}/>)}
               </div>
 

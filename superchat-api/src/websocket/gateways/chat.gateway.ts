@@ -11,6 +11,7 @@ import { WsExceptionFilter } from '@/shared/filters/ws-exception.filter';
 import { CHAT_SERVICE, MESSAGE_SERVICE } from '@/shared/symbols';
 import { IChatService } from '@/chat/interfaces/chat.service.interface';
 import { IMessageService } from '@/message/interfaces/message.service.interface';
+import { MessageStatus } from '@/message/enums/MessageStatus.enum';
 
 @UseFilters(new WsExceptionFilter())
 @WebSocketGateway(80, {
@@ -42,7 +43,7 @@ export class ChatGateway {
   @UseGuards(WsAuthGuard)
   @SubscribeMessage('message')
   async sendMessage(
-    @MessageBody() data: { chatId: string; message: string },
+    @MessageBody() data: { chatId: string; message: string; tempId: string },
     @ConnectedSocket() client: Socket,
   ) {
     const userId = client.data.user.sub;
@@ -57,6 +58,14 @@ export class ChatGateway {
       from: userId,
       message,
       timestamp: new Date(),
+    });
+
+    await new Promise((res) => setTimeout(res, 3000));
+
+    client.emit('messageStatus', {
+      tempId: data.tempId,
+      status: MessageStatus.SENT,
+      message,
     });
 
     return { status: 'ok' };
