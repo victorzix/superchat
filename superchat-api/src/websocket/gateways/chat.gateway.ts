@@ -12,6 +12,8 @@ import { CHAT_SERVICE, MESSAGE_SERVICE } from '@/shared/symbols';
 import { IChatService } from '@/chat/interfaces/chat.service.interface';
 import { IMessageService } from '@/message/interfaces/message.service.interface';
 import { MessageStatus } from '@/message/enums/MessageStatus.enum';
+import { MessageType } from '@/message/enums/MessageType.enum';
+import { SendMessageRequestDto } from '@/message/dto/request/send-message-request.dto';
 
 @UseFilters(new WsExceptionFilter())
 @WebSocketGateway(80, {
@@ -43,15 +45,15 @@ export class ChatGateway {
   @UseGuards(WsAuthGuard)
   @SubscribeMessage('message')
   async sendMessage(
-    @MessageBody() data: { chatId: string; message: string; tempId: string },
+    @MessageBody()
+    data: SendMessageRequestDto & {
+      tempId: string;
+    },
     @ConnectedSocket() client: Socket,
   ) {
     const userId = client.data.user.sub;
 
-    const message = await this.messageService.sendMessage(
-      { messageText: data.message, chatId: data.chatId },
-      userId,
-    );
+    const message = await this.messageService.sendMessage(data, userId);
 
     client.to(`chat_${data.chatId}`).emit('message', {
       chatId: data.chatId,

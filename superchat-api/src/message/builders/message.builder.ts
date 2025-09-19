@@ -13,6 +13,8 @@ export class MessageBuilder {
       text: textDecrypt(),
       status: dto.status,
       createdAt: dto.createdAt,
+      filePath: dto.filePath,
+      messageType: dto.messageType,
     };
   }
 }

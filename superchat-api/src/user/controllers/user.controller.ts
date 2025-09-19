@@ -56,6 +56,7 @@ export class UserController {
   @UseGuards(AuthGuard)
   @Post('logout')
   async logout(@Res() res: Response) {
+    console.log('foi aqui')
     res.clearCookie('refresh_token');
     res.clearCookie('access_token');
     return res.status(HttpStatus.OK).end();

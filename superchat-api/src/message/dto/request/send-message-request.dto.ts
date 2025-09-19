@@ -1,15 +1,32 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEnum, IsString } from 'class-validator';
 import { Sanitize } from '@/shared/decorators/sanitize.decorator';
+import { MessageType } from '@/message/enums/MessageType.enum';
 
 export class SendMessageRequestDto {
   @ApiProperty()
   @IsString()
   @Sanitize()
-  messageText: string;
+  chatId: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsString()
   @Sanitize()
-  chatId: string;
+  messageText: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  filePath?: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  fileType?: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  fileName?: string;
+
+  @ApiProperty()
+  @IsEnum(MessageType)
+  messageType: MessageType;
 }

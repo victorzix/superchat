@@ -9,6 +9,7 @@ import { MongodbModule } from '@/providers/mongodb/mongodb.module';
 import { UserModule } from '@/user/user.module';
 import { MESSAGE_REPOSITORY, MESSAGE_SERVICE } from '@/shared/symbols';
 import { MessageRepository } from '@/message/repositories/message.repository';
+import { SupabaseModule } from '@/providers/supabase/supabase.module';
 
 @Module({
   providers: [
@@ -27,6 +28,7 @@ import { MessageRepository } from '@/message/repositories/message.repository';
     ChatModule,
     MongooseModule.forFeature([{ name: 'Message', schema: MessageSchema }]),
     MongodbModule,
+    SupabaseModule,
   ],
   controllers: [MessageController],
   exports: [MESSAGE_SERVICE],

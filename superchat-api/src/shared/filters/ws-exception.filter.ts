@@ -7,6 +7,7 @@ export class WsExceptionFilter extends BaseWsExceptionFilter {
   private readonly logger = new Logger('WsExceptionFilter');
 
   catch(exception: WsException, host: ArgumentsHost) {
+    console.log(exception);
     const ctx = host.switchToWs();
     const client = ctx.getClient<Socket>();
 

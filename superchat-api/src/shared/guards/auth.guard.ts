@@ -26,12 +26,12 @@ export class AuthGuard implements CanActivate {
     const refreshToken = request.cookies?.refresh_token;
 
     try {
-      if (!token) {
-        if (refreshToken) {
-          await this.userService.refresh(response, refreshToken);
-          return true;
-        }
+      if (!this.handleTokens(response, token, refreshToken)) {
+        return false;
       }
+
+      await this.userService.refresh(response, refreshToken);
+
       const payload = await this.jwtService.verifyAsync(token);
       const user = await this.userService.getData({ id: payload.sub });
       if (!user) throw new UnauthorizedException('Usuário não encontrado');
@@ -44,5 +44,26 @@ export class AuthGuard implements CanActivate {
       }
       throw new UnauthorizedException('Faça o login novamente');
     }
+  }
+
+  private handleTokens(
+    response: Response,
+    token?: string,
+    refreshToken?: string,
+  ) {
+    if (!token && !refreshToken)
+      throw new UnauthorizedException('Faça o login novamente');
+
+    if (!token) {
+      response.clearCookie('refresh_token');
+      throw new UnauthorizedException('Faça o login novamente');
+    }
+
+    if (!refreshToken) {
+      response.clearCookie('access_token');
+      throw new UnauthorizedException('Faça o login novamente');
+    }
+
+    return true;
   }
 }

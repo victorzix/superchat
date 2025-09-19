@@ -5,11 +5,14 @@ import { CHAT_SERVICE } from '@/shared/symbols/chat.symbols';
 import { IChatService } from '@/chat/interfaces/chat.service.interface';
 import { SendMessageRequestDto } from '@/message/dto/request/send-message-request.dto';
 import { IMessageService } from '@/message/interfaces/message.service.interface';
-import { MESSAGE_REPOSITORY } from '@/shared/symbols';
+import { MESSAGE_REPOSITORY, SUPABASE } from '@/shared/symbols';
 import { IMessageRepository } from '@/message/interfaces/message.repository.interface';
 import { MessageBuilder } from '@/message/builders/message.builder';
 import { MessageResponseDto } from '@/message/dto/responses/message-response.dto';
-import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { MessageType } from '@/message/enums/MessageType.enum';
+import { SupabaseClient } from '@supabase/supabase-js';
+import { SendMessageDto } from '@/message/dto/request/send-message.dto';
 
 @Injectable()
 export class MessageService implements IMessageService {
@@ -19,38 +22,28 @@ export class MessageService implements IMessageService {
     @Inject(MESSAGE_REPOSITORY)
     private readonly messageRepository: IMessageRepository,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @Inject(SUPABASE) private readonly supabase: SupabaseClient,
   ) {}
 
   async sendMessage(
     dto: SendMessageRequestDto,
     senderId: string,
   ): Promise<MessageResponseDto> {
-    const chatKeys = await this.chatService.getChatKeys(dto.chatId);
-    const { ciphertext, iv, authTag } = this.cryptoService.encryptMessage(
-      dto.messageText,
-      Buffer.from(chatKeys.keys),
-    );
-
-    const message = await this.messageRepository.sendMessage({
-      senderId,
-      chatId: dto.chatId,
-      ciphertext,
-      iv,
-      authTag,
-    });
-
-    const buildedMessage = MessageBuilder.buildMessageResponse(message, () =>
-      this.cryptoService.decryptMessage(
-        message.ciphertext,
-        message.iv,
-        message.authTag,
-        Buffer.from(chatKeys.keys),
-      ),
-    );
-
     const cachedMessages = await this.cacheManager.get<MessageResponseDto[]>(
       `chat_${dto.chatId}:messages`,
     );
+
+    let buildedMessage: MessageResponseDto;
+
+    switch (dto.messageType) {
+      case MessageType.TEXT:
+        buildedMessage = await this.sendTextMessage(dto, senderId);
+        break;
+      case MessageType.FILE:
+      case MessageType.IMAGE:
+        buildedMessage = await this.sendFileMessage(dto, senderId);
+        break;
+    }
 
     if (cachedMessages) {
       cachedMessages.push(buildedMessage);
@@ -59,7 +52,9 @@ export class MessageService implements IMessageService {
         cachedMessages,
       );
     } else {
-      await this.cacheManager.set(`chat_${dto.chatId}:messages`, [message]);
+      await this.cacheManager.set(`chat_${dto.chatId}:messages`, [
+        buildedMessage,
+      ]);
     }
 
     return buildedMessage;
@@ -77,14 +72,27 @@ export class MessageService implements IMessageService {
     const newMessages = await this.messageRepository.findMessages(chatId);
 
     const buildedMessages = newMessages.map((msg: Message) => {
-      return MessageBuilder.buildMessageResponse(msg, () =>
-        this.cryptoService.decryptMessage(
-          msg.ciphertext,
-          msg.iv,
-          msg.authTag,
-          Buffer.from(keys.keys),
-        ),
-      );
+      if (msg.ciphertext) {
+        return MessageBuilder.buildMessageResponse(msg, () =>
+          this.cryptoService.decryptMessage(
+            msg.ciphertext,
+            msg.iv,
+            msg.authTag,
+            Buffer.from(keys.keys),
+          ),
+        );
+      } else {
+        return {
+          _id: msg._id,
+          filePath: msg.filePath,
+          messageType: msg.messageType,
+          fileType: msg.fileType,
+          chatId: msg.chatId,
+          senderId: msg.senderId,
+          status: msg.status,
+          createdAt: msg.createdAt,
+        };
+      }
     });
 
     await this.cacheManager.set(
@@ -94,5 +102,82 @@ export class MessageService implements IMessageService {
     );
 
     return buildedMessages;
+  }
+
+  private async sendTextMessage(dto: SendMessageRequestDto, senderId: string) {
+    const chatKeys = await this.chatService.getChatKeys(dto.chatId);
+    const { ciphertext, iv, authTag } = this.cryptoService.encryptMessage(
+      dto.messageText,
+      Buffer.from(chatKeys.keys),
+    );
+
+    const message = await this.messageRepository.sendMessage({
+      senderId,
+      chatId: dto.chatId,
+      ciphertext,
+      iv,
+      authTag,
+    });
+
+    return MessageBuilder.buildMessageResponse(message, () =>
+      this.cryptoService.decryptMessage(
+        message.ciphertext,
+        message.iv,
+        message.authTag,
+        Buffer.from(chatKeys.keys),
+      ),
+    );
+  }
+
+  private async sendFileMessage(dto: SendMessageRequestDto, senderId: string) {
+    const chatKeys = await this.chatService.getChatKeys(dto.chatId);
+    let baseMessage: SendMessageDto = {
+      chatId: dto.chatId,
+      senderId,
+      filePath: dto.filePath,
+      messageType: dto.messageType,
+    };
+
+    if (dto.messageText) {
+      const { ciphertext, iv, authTag } = this.cryptoService.encryptMessage(
+        dto.messageText,
+        Buffer.from(chatKeys.keys),
+      );
+
+      baseMessage = {
+        ...baseMessage,
+        ciphertext,
+        iv,
+        authTag,
+      };
+    }
+
+    const message = await this.messageRepository.sendMessage({
+      ...baseMessage,
+      fileType: dto.fileType,
+    });
+
+    if (dto.messageText) {
+      return MessageBuilder.buildMessageResponse(message, () =>
+        this.cryptoService.decryptMessage(
+          message.ciphertext,
+          message.iv,
+          message.authTag,
+          Buffer.from(chatKeys.keys),
+        ),
+      );
+    } else {
+      return {
+        _id: message._id,
+        filePath: message.filePath,
+        messageType: message.messageType,
+        fileName: message.fileName,
+        fileType: message.fileType,
+        chatId: message.chatId,
+        senderId: message.senderId,
+        status: message.status,
+        createdAt: message.createdAt,
+      };
+    }
   }
 }

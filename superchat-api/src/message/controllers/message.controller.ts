@@ -6,7 +6,7 @@ import {
   Inject,
   Param,
   Post,
-  Req,
+  Req, UploadedFile,
   UseGuards,
 } from '@nestjs/common';
 import { Request } from 'express';
