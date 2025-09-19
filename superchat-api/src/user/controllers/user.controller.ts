@@ -50,13 +50,12 @@ export class UserController {
   @UseGuards(AuthGuard)
   @Get()
   async getData(@Req() req: Request) {
-    return await this.userService.getData({id: req.user.sub});
+    return await this.userService.getData({ id: req.user.sub });
   }
 
   @UseGuards(AuthGuard)
   @Post('logout')
   async logout(@Res() res: Response) {
-    console.log('foi aqui')
     res.clearCookie('refresh_token');
     res.clearCookie('access_token');
     return res.status(HttpStatus.OK).end();

@@ -46,9 +46,11 @@ export function useUser() {
 
   async function logoutUser() {
     try {
-      reset();
       await logout();
+    } catch (err) {
+      console.error(err)
     } finally {
+      reset();
       router.push('/login')
     }
   }
