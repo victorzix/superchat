@@ -7,6 +7,7 @@ import {FaClock} from "react-icons/fa";
 import {format} from "date-fns";
 import {MessageStatus} from "@/features/message/enums/MessageStatus";
 import {FaCircleCheck} from "react-icons/fa6";
+import {MessageType} from "@/features/message/enums/MessageType.enum";
 
 interface MessageProps {
   message: IMessage
@@ -16,66 +17,131 @@ export default function Message({message}: MessageProps) {
   const {user} = useUser();
   const {selectedChat} = useSelectedChat();
 
+
   const isOwnMessage = user?.id === message.senderId;
   const sender = selectedChat?.members.find(
     (member) => member.id === message.senderId
   );
 
-  return (
-    <div
-      className={cn(
-        "flex w-full items-end gap-2",
-        isOwnMessage ? "justify-end" : "justify-start"
-      )}
-    >
-      {!isOwnMessage && (
-        <Avatar className="w-6 h-6">
-          <AvatarImage src={sender?.profilePicture} alt="avatar"/>
-          <AvatarFallback className="truncate text-xs">
-            {sender?.name?.[0]}
-          </AvatarFallback>
-        </Avatar>
-      )}
-
+  if (message.messageType === MessageType.TEXT) {
+    return (
       <div
         className={cn(
-          "flex flex-col text-white font-bold max-w-[50%] break-all whitespace-pre-wrap text-sm rounded-lg p-3",
-          isOwnMessage ? "bg-blue-600" : "bg-gray-500"
+          "flex w-full items-end gap-2",
+          isOwnMessage ? "justify-end" : "justify-start"
         )}
       >
-        {message.text}
+        {!isOwnMessage && (
+          <Avatar className="w-6 h-6">
+            <AvatarImage src={sender?.profilePicture} alt="avatar"/>
+            <AvatarFallback className="truncate text-xs">
+              {sender?.name?.[0]}
+            </AvatarFallback>
+          </Avatar>
+        )}
 
-        <div className='flex gap-2 items-center w-full justify-end'>
+        <div
+          className={cn(
+            "flex flex-col text-white font-bold max-w-[50%] break-all whitespace-pre-wrap text-sm rounded-lg p-3",
+            isOwnMessage ? "bg-blue-600" : "bg-gray-500"
+          )}
+        >
+          {message.text}
+
+          <div className='flex gap-2 items-center w-full justify-end'>
           <span
             className={cn('font-bold text-white bottom-2 text-xs text-gray-200 font-light', isOwnMessage ? 'right-2' : 'left-2')}>
             {format(message.createdAt, 'HH:mm')}
           </span>
 
-          {isOwnMessage &&
-              <span
-                  className={cn(
-                    'font-bold text-gray-200 bottom-2 text-xs transition-colors duration-300 ease-in-out',
-                    isOwnMessage ? 'right-2' : 'left-2',
-                    message.status === MessageStatus.DELIVERED && 'text-yellow-400',
-                    message.status === MessageStatus.READ && 'text-green-400'
-                  )}>
+            {isOwnMessage &&
+                <span
+                    className={cn(
+                      'font-bold text-gray-200 bottom-2 text-xs transition-colors duration-300 ease-in-out',
+                      isOwnMessage ? 'right-2' : 'left-2',
+                      message.status === MessageStatus.DELIVERED && 'text-yellow-400',
+                      message.status === MessageStatus.READ && 'text-green-400'
+                    )}>
                {message.status === MessageStatus.PENDING && <FaClock/>}
-                {(message.status === MessageStatus.SENT || message.status === MessageStatus.DELIVERED || message.status === MessageStatus.READ) &&
-                    <FaCircleCheck/>
-                }
+                  {(message.status === MessageStatus.SENT || message.status === MessageStatus.DELIVERED || message.status === MessageStatus.READ) &&
+                      <FaCircleCheck/>
+                  }
               </span>
-          }
+            }
+          </div>
         </div>
-      </div>
 
-      {isOwnMessage && (
-        <Avatar className="w-6 h-6">
-          <AvatarImage src={sender?.profilePicture} alt="avatar"/>
-          <AvatarFallback className="truncate text-xs">
-            {sender?.name?.[0]}
-          </AvatarFallback>
-        </Avatar>
-      )}
-    </div>
-  );
+        {isOwnMessage && (
+          <Avatar className="w-6 h-6">
+            <AvatarImage src={sender?.profilePicture} alt="avatar"/>
+            <AvatarFallback className="truncate text-xs">
+              {sender?.name?.[0]}
+            </AvatarFallback>
+          </Avatar>
+        )}
+      </div>
+    );
+  }
+
+  if (message.messageType === MessageType.FILE) {
+    return (
+      <div
+        className={cn(
+          "flex w-full items-end gap-2",
+          isOwnMessage ? "justify-end" : "justify-start"
+        )}
+      >
+        {!isOwnMessage && (
+          <Avatar className="w-6 h-6">
+            <AvatarImage src={sender?.profilePicture} alt="avatar"/>
+            <AvatarFallback className="truncate text-xs">
+              {sender?.name?.[0]}
+            </AvatarFallback>
+          </Avatar>
+        )}
+
+        <div>{message.fileName}</div>
+
+        <div
+          className={cn(
+            "flex flex-col text-white font-bold max-w-[50%] break-all whitespace-pre-wrap text-sm rounded-lg p-3",
+            isOwnMessage ? "bg-blue-600" : "bg-gray-500"
+          )}
+        >
+          {message.text ?? ''}
+
+          <div className='flex gap-2 items-center w-full justify-end'>
+          <span
+            className={cn('font-bold text-white bottom-2 text-xs text-gray-200 font-light', isOwnMessage ? 'right-2' : 'left-2')}>
+            {format(message.createdAt, 'HH:mm')}
+          </span>
+
+            {isOwnMessage &&
+                <span
+                    className={cn(
+                      'font-bold text-gray-200 bottom-2 text-xs transition-colors duration-300 ease-in-out',
+                      isOwnMessage ? 'right-2' : 'left-2',
+                      message.status === MessageStatus.DELIVERED && 'text-yellow-400',
+                      message.status === MessageStatus.READ && 'text-green-400'
+                    )}>
+               {message.status === MessageStatus.PENDING && <FaClock/>}
+                  {(message.status === MessageStatus.SENT || message.status === MessageStatus.DELIVERED || message.status === MessageStatus.READ) &&
+                      <FaCircleCheck/>
+                  }
+              </span>
+            }
+          </div>
+        </div>
+
+        {isOwnMessage && (
+          <Avatar className="w-6 h-6">
+            <AvatarImage src={sender?.profilePicture} alt="avatar"/>
+            <AvatarFallback className="truncate text-xs">
+              {sender?.name?.[0]}
+            </AvatarFallback>
+          </Avatar>
+        )}
+      </div>
+    )
+  }
 }

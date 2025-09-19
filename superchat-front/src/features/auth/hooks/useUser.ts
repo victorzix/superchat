@@ -3,7 +3,7 @@ import {useRouter} from 'next/navigation';
 import {LoginFormData} from '../schemas/loginSchema';
 import {useAuthStore} from "@/store/authStore";
 import {useStore} from "zustand/react";
-import {useState} from "react";
+import {useCallback, useState} from "react";
 import {RegisterFormData} from "@/features/auth/schemas/registerSchema";
 import {AxiosError} from "axios";
 
@@ -45,7 +45,7 @@ export function useUser() {
     }
   }
 
-  async function getUser() {
+  const getUser = useCallback(async () => {
     try {
       setIsPending(true)
       const userData = await getUserData();
@@ -58,7 +58,7 @@ export function useUser() {
     } finally {
       setIsPending(false)
     }
-  }
+  }, [setUser, reset, router])
 
   return {
     loginUser,

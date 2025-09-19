@@ -1,6 +1,6 @@
 'use client'
 import {useUser} from "@/features/auth/hooks/useUser";
-import {useEffect, useRef, useState} from "react";
+import {useEffect} from "react";
 import MobileLayout from "@/features/dashboard/MobileLayout";
 import {useIsMobile} from "@/hooks/useIsMobile";
 import Sidebar from "@/features/dashboard/components/sidebar";
@@ -10,7 +10,7 @@ import Chat from "@/features/chat/components/chat";
 import {useSocket} from "@/hooks/useSocket";
 
 export default function Dashboard() {
-  const {user, getUser, logoutUser} = useUser();
+  const {user, getUser} = useUser();
   const {activeTab} = useSidebar();
   const isMobile = useIsMobile();
 
@@ -28,11 +28,9 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!user) {
-      getUser().catch(async () => {
-        await logoutUser();
-      });
+      void getUser()
     }
-  }, [user, getUser, logoutUser]);
+  }, [user, getUser]);
 
   if (!user) return null;
 
