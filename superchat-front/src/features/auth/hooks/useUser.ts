@@ -6,6 +6,8 @@ import {useStore} from "zustand/react";
 import {useCallback, useState} from "react";
 import {RegisterFormData} from "@/features/auth/schemas/registerSchema";
 import {AxiosError} from "axios";
+import {HookResponse} from "@/types/hookResponse";
+import {handleError} from "@/utils/handleError";
 
 export function useUser() {
   const router = useRouter();
@@ -13,24 +15,30 @@ export function useUser() {
   const {setUser, user, reset} = useStore(useAuthStore);
   const [isPending, setIsPending] = useState(false);
 
-  async function registerUser(data: RegisterFormData) {
-    setIsPending(true);
+  async function registerUser(data: RegisterFormData): Promise<HookResponse> {
     try {
+      setIsPending(true);
       const response = await register(data);
       setUser(response);
       router.push('/dashboard');
+      return {data: undefined}
+    } catch (error) {
+      return {error: handleError(error)}
     } finally {
       setIsPending(false);
     }
   }
 
-  async function loginUser(data: LoginFormData) {
-    setIsPending(true);
+  async function loginUser(data: LoginFormData): Promise<HookResponse> {
     try {
+      setIsPending(true);
       await login(data);
       const userData = await getUserData();
       setUser(userData);
       router.push('/dashboard');
+      return {data: undefined};
+    } catch (error) {
+      return {error: handleError(error)}
     } finally {
       setIsPending(false);
     }

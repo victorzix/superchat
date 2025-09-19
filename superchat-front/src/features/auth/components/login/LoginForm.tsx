@@ -40,14 +40,9 @@ export function LoginForm() {
     return () => subscription.unsubscribe();
   }, [watch, error]);
 
-  const onSubmit = (data: LoginFormData) => {
-    loginUser(data).catch(error => {
-      if (error.response?.data?.response?.message) {
-        setError(error.response.data.response.message);
-      } else {
-        setError('Erro inesperado');
-      }
-    });
+  const onSubmit = async (data: LoginFormData) => {
+    const {error: loginError} = await loginUser(data);
+    if (loginError) setError(loginError);
   };
 
   return (

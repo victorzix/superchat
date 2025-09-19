@@ -16,7 +16,6 @@ import {useUser} from "@/features/auth/hooks/useUser";
 import {useEffect, useState} from "react";
 import {cn} from "@/lib/utils";
 import {isValidBrazilianMobile} from "@/utils/validatePhone";
-import {handleError} from "@/utils/handleError";
 
 export default function RegisterForm() {
   const {
@@ -48,15 +47,13 @@ export default function RegisterForm() {
   const {registerUser, isPending} = useUser();
 
   const onSubmit = async (data: RegisterFormData) => {
-    try {
-      await registerUser({
-        ...data, ...(files[0]?.file instanceof File && {
-          profilePicture: files[0].file,
-        })
+    const {error: registerError} = await registerUser({
+      ...data, ...(files[0]?.file instanceof File && {
+        profilePicture: files[0].file,
       })
-    } catch (error) {
-      setError(handleError(error));
-    }
+    })
+
+    if (registerError) setError(registerError);
   };
 
   const nameInput = watch('name');
@@ -69,7 +66,7 @@ export default function RegisterForm() {
     if (error && phoneValue) {
       setError(null);
     }
-  }, [phoneValue]);
+  }, [phoneValue, error]);
 
   return (
     <motion.form transition={{layout: {duration: 0.5}}} onSubmit={handleSubmit(onSubmit)}
